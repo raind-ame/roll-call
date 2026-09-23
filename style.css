@@ -7,6 +7,9 @@
   --primary: #4f46e5;
   --primary-dark: #4338ca;
   --danger: #dc2626;
+  --present: #16a34a;
+  --late: #d97706;
+  --absent: #dc2626;
   --radius: 12px;
   --shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
@@ -75,6 +78,42 @@ body {
   margin-top: 8px;
   font-size: 0.85rem;
   color: var(--muted);
+}
+
+/* 統計 */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.stat {
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 12px 8px;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.stat strong {
+  display: block;
+  font-size: 1.5rem;
+  color: var(--text);
+}
+
+.stat.present strong {
+  color: var(--present);
+}
+
+.stat.late strong {
+  color: var(--late);
+}
+
+.stat.absent strong {
+  color: var(--absent);
 }
 
 /* 按鈕 */
@@ -158,6 +197,49 @@ body {
   font-weight: 500;
 }
 
+.student.absent .student-name {
+  color: var(--muted);
+}
+
+.status-group {
+  display: flex;
+  gap: 4px;
+}
+
+.status-btn {
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--muted);
+  font: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.status-btn:hover {
+  background: #f3f4f6;
+}
+
+.status-btn.active {
+  color: #fff;
+}
+
+.status-btn.present.active {
+  background: var(--present);
+  border-color: var(--present);
+}
+
+.status-btn.late.active {
+  background: var(--late);
+  border-color: var(--late);
+}
+
+.status-btn.absent.active {
+  background: var(--absent);
+  border-color: var(--absent);
+}
+
 .btn-delete {
   border: none;
   background: none;
@@ -176,4 +258,21 @@ body {
   text-align: center;
   color: var(--muted);
   padding: 24px 0;
+}
+
+/* 手機版 */
+@media (max-width: 520px) {
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .student {
+    flex-wrap: wrap;
+  }
+
+  .status-group {
+    order: 1;
+    width: 100%;
+    padding-left: calc(2em + 12px);
+  }
 }

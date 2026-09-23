@@ -21,10 +21,20 @@
       <p class="hint">按 Enter 新增，Shift + Enter 換行；也可以直接從 Excel 貼上整欄姓名。</p>
     </section>
 
+    <section class="stats">
+      <div class="stat"><strong id="stat-total">0</strong>總人數</div>
+      <div class="stat present"><strong id="stat-present">0</strong>出席</div>
+      <div class="stat late"><strong id="stat-late">0</strong>遲到</div>
+      <div class="stat absent"><strong id="stat-absent">0</strong>缺席</div>
+      <div class="stat"><strong id="stat-unmarked">0</strong>未點名</div>
+    </section>
+
     <section class="card">
       <div class="list-header">
         <h2>學生名單</h2>
         <div class="actions">
+          <button type="button" id="rest-present-btn" class="btn" title="把還沒點名的學生都設為出席">其餘設為出席</button>
+          <button type="button" id="reset-btn" class="btn">重設點名</button>
           <button type="button" id="clear-btn" class="btn btn-danger">清空名單</button>
         </div>
       </div>
