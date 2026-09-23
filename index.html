@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>點名系統</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="container">
+    <header class="header">
+      <h1>點名系統</h1>
+      <p id="today" class="today"></p>
+    </header>
+
+    <section class="card">
+      <form id="add-form" class="add-form">
+        <textarea id="name-input" rows="2" placeholder="輸入學生姓名，多人可用逗號或換行分隔"></textarea>
+        <button type="submit" class="btn btn-primary">新增</button>
+      </form>
+      <p class="hint">按 Enter 新增，Shift + Enter 換行；也可以直接從 Excel 貼上整欄姓名。</p>
+    </section>
+
+    <section class="card">
+      <div class="list-header">
+        <h2>學生名單</h2>
+        <div class="actions">
+          <button type="button" id="clear-btn" class="btn btn-danger">清空名單</button>
+        </div>
+      </div>
+      <ul id="student-list" class="student-list"></ul>
+      <p id="empty-tip" class="empty-tip">目前還沒有學生，請先新增名單。</p>
+    </section>
+  </main>
+
+  <script src="script.js"></script>
+</body>
+</html>
