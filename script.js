@@ -16,8 +16,11 @@ const statPresent = document.getElementById('stat-present');
 const statLate = document.getElementById('stat-late');
 const statAbsent = document.getElementById('stat-absent');
 const statUnmarked = document.getElementById('stat-unmarked');
+const pickedName = document.getElementById('picked-name');
+const pickBtn = document.getElementById('pick-btn');
 
 let students = loadStudents();
+let pickedStudent = ''; // 最近一次抽中的姓名，用來在名單中標示
 
 function loadStudents() {
   let data;
@@ -46,6 +49,7 @@ function render() {
     const li = document.createElement('li');
     li.className = 'student';
     if (student.status) li.classList.add(student.status);
+    if (student.name === pickedStudent) li.classList.add('picked');
 
     const no = document.createElement('span');
     no.className = 'student-no';
@@ -116,6 +120,34 @@ function addStudents() {
   update();
 }
 
+function pickRandom() {
+  // 缺席的學生不會被抽到
+  const candidates = students.filter((student) => student.status !== 'absent');
+  if (candidates.length === 0) {
+    pickedName.textContent = '沒有可抽的學生';
+    return;
+  }
+
+  let times = 0;
+  pickBtn.disabled = true;
+  pickedName.classList.add('rolling');
+
+  // 快速輪播名字，最後停下來的就是抽中的人
+  const timer = setInterval(() => {
+    const student = candidates[Math.floor(Math.random() * candidates.length)];
+    pickedName.textContent = student.name;
+    times++;
+
+    if (times >= 15) {
+      clearInterval(timer);
+      pickedName.classList.remove('rolling');
+      pickBtn.disabled = false;
+      pickedStudent = student.name;
+      render();
+    }
+  }, 60);
+}
+
 addForm.addEventListener('submit', (e) => {
   e.preventDefault();
   addStudents();
@@ -143,6 +175,8 @@ studentList.addEventListener('click', (e) => {
   }
   update();
 });
+
+pickBtn.addEventListener('click', pickRandom);
 
 restPresentBtn.addEventListener('click', () => {
   students.forEach((student) => {

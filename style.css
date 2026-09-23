@@ -150,6 +150,31 @@ body {
   background: #fef2f2;
 }
 
+.btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 隨機點名 */
+.picker {
+  text-align: center;
+}
+
+.picked-name {
+  min-height: 3.75rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--primary);
+}
+
+.picked-name.rolling {
+  color: var(--muted);
+}
+
+.picker .hint {
+  margin: 0 0 12px;
+}
+
 /* 學生名單 */
 .list-header {
   display: flex;
@@ -199,6 +224,11 @@ body {
 
 .student.absent .student-name {
   color: var(--muted);
+}
+
+.student.picked {
+  background: #eef2ff;
+  box-shadow: inset 3px 0 var(--primary);
 }
 
 .status-group {
