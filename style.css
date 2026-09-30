@@ -88,7 +88,8 @@ body {
 
 /* 輸入框 */
 .add-form textarea,
-.homework-form input {
+.homework-form input,
+.timer-inputs input {
   padding: 10px 12px;
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -96,7 +97,8 @@ body {
 }
 
 .add-form textarea:focus,
-.homework-form input:focus {
+.homework-form input:focus,
+.timer-inputs input:focus {
   outline: 2px solid var(--primary);
   border-color: transparent;
 }
@@ -482,6 +484,66 @@ body {
 
 .submit-item input {
   accent-color: var(--present);
+}
+
+/* 計時器 */
+.timer {
+  text-align: center;
+}
+
+.timer-display {
+  font-size: clamp(3rem, 16vw, 6rem);
+  font-weight: 700;
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer-display.done {
+  color: var(--danger);
+  animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.timer .progress-bar {
+  height: 8px;
+  margin: 8px 0 24px;
+}
+
+.timer .progress-fill {
+  background: var(--primary);
+  transition: width 0.2s linear;
+}
+
+.timer-presets,
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.timer-inputs {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 6px;
+  margin: 16px 0 24px;
+  color: var(--muted);
+}
+
+.timer-inputs input {
+  width: 80px;
+  text-align: center;
+  color: var(--text);
+}
+
+.timer-controls .btn {
+  min-width: 96px;
 }
 
 /* 手機版 */

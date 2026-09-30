@@ -16,6 +16,7 @@
     <nav class="tabs">
       <button type="button" class="tab active" data-tab="attendance">點名</button>
       <button type="button" class="tab" data-tab="homework">作業</button>
+      <button type="button" class="tab" data-tab="timer">計時器</button>
     </nav>
 
     <div id="tab-attendance" class="tab-panel">
@@ -67,6 +68,30 @@
 
       <ul id="homework-list" class="homework-list"></ul>
       <p id="homework-empty" class="card empty-tip">還沒有作業，先新增一份吧。</p>
+    </div>
+
+    <div id="tab-timer" class="tab-panel" hidden>
+      <section class="card timer">
+        <div id="timer-display" class="timer-display">05:00</div>
+        <span class="progress-bar"><span id="timer-fill" class="progress-fill"></span></span>
+
+        <div class="timer-presets">
+          <button type="button" class="btn" data-minutes="1">1 分鐘</button>
+          <button type="button" class="btn" data-minutes="3">3 分鐘</button>
+          <button type="button" class="btn" data-minutes="5">5 分鐘</button>
+          <button type="button" class="btn" data-minutes="10">10 分鐘</button>
+        </div>
+
+        <div class="timer-inputs">
+          <input id="timer-minutes" type="number" min="0" max="999" value="5" aria-label="分鐘"> 分
+          <input id="timer-seconds" type="number" min="0" max="59" value="0" aria-label="秒"> 秒
+        </div>
+
+        <div class="timer-controls">
+          <button type="button" id="timer-start" class="btn btn-primary">開始</button>
+          <button type="button" id="timer-reset" class="btn">重設</button>
+        </div>
+      </section>
     </div>
   </main>
 

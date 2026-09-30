@@ -26,11 +26,23 @@ const homeworkTitle = document.getElementById('homework-title');
 const homeworkDue = document.getElementById('homework-due');
 const homeworkList = document.getElementById('homework-list');
 const homeworkEmpty = document.getElementById('homework-empty');
+const timerDisplay = document.getElementById('timer-display');
+const timerFill = document.getElementById('timer-fill');
+const timerPresets = document.querySelectorAll('[data-minutes]');
+const timerMinutes = document.getElementById('timer-minutes');
+const timerSeconds = document.getElementById('timer-seconds');
+const timerStartBtn = document.getElementById('timer-start');
+const timerResetBtn = document.getElementById('timer-reset');
 
 let students = loadStudents();
 let pickedStudent = ''; // 最近一次抽中的姓名，用來在名單中標示
 let homework = loadHomework();
 let openHomeworkId = null; // 目前展開的作業
+let timerTotal = 0; // 設定的秒數
+let timerRemaining = 0; // 剩下的秒數
+let timerEndAt = 0; // 預計結束的時間點，用時間差計算才不會越跑越慢
+let timerId = null;
+let audioCtx = null;
 
 function loadStudents() {
   let data;
@@ -402,6 +414,99 @@ homeworkList.addEventListener('change', (e) => {
   updateHomework();
 });
 
+// ===== 計時器 =====
+
+function formatTime(seconds) {
+  const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
+  return `${minutes}:${String(seconds % 60).padStart(2, '0')}`;
+}
+
+function renderTimer() {
+  const done = timerTotal > 0 && timerRemaining === 0;
+  timerDisplay.textContent = done ? '時間到！' : formatTime(timerRemaining);
+  timerDisplay.classList.toggle('done', done);
+  timerFill.style.width = timerTotal ? `${(timerRemaining / timerTotal) * 100}%` : '0';
+
+  if (timerId) {
+    timerStartBtn.textContent = '暫停';
+  } else if (timerRemaining > 0 && timerRemaining < timerTotal) {
+    timerStartBtn.textContent = '繼續';
+  } else {
+    timerStartBtn.textContent = '開始';
+  }
+  timerStartBtn.disabled = timerTotal === 0;
+}
+
+function startTimer() {
+  // 在使用者按下按鈕時建立音效，瀏覽器才允許時間到時自動播放
+  audioCtx ??= new AudioContext();
+
+  if (timerRemaining === 0) timerRemaining = timerTotal; // 時間到之後再按一次就重新開始
+  timerEndAt = Date.now() + timerRemaining * 1000;
+  timerId = setInterval(tick, 200);
+  renderTimer();
+}
+
+function stopTimer() {
+  clearInterval(timerId);
+  timerId = null;
+  renderTimer();
+}
+
+function tick() {
+  timerRemaining = Math.max(0, Math.ceil((timerEndAt - Date.now()) / 1000));
+  if (timerRemaining === 0) {
+    stopTimer();
+    beep();
+  } else {
+    renderTimer();
+  }
+}
+
+// 用 Web Audio 發出三聲「嗶」，不需要額外的音效檔
+function beep() {
+  [0, 0.4, 0.8].forEach((delay) => {
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    oscillator.frequency.value = 880;
+    gain.gain.value = 0.2;
+    oscillator.connect(gain).connect(audioCtx.destination);
+    oscillator.start(audioCtx.currentTime + delay);
+    oscillator.stop(audioCtx.currentTime + delay + 0.2);
+  });
+}
+
+// 依輸入框的分、秒重新設定計時器
+function setTimerFromInputs() {
+  const minutes = Math.max(0, Math.floor(Number(timerMinutes.value) || 0));
+  const seconds = Math.min(59, Math.max(0, Math.floor(Number(timerSeconds.value) || 0)));
+
+  stopTimer();
+  timerTotal = minutes * 60 + seconds;
+  timerRemaining = timerTotal;
+  renderTimer();
+}
+
+timerPresets.forEach((btn) => {
+  btn.addEventListener('click', () => {
+    timerMinutes.value = btn.dataset.minutes;
+    timerSeconds.value = 0;
+    setTimerFromInputs();
+  });
+});
+
+timerMinutes.addEventListener('input', setTimerFromInputs);
+timerSeconds.addEventListener('input', setTimerFromInputs);
+timerResetBtn.addEventListener('click', setTimerFromInputs);
+
+timerStartBtn.addEventListener('click', () => {
+  if (timerId) {
+    stopTimer();
+  } else {
+    startTimer();
+  }
+});
+
 todayText.textContent = new Date().toLocaleDateString('zh-TW', {
   year: 'numeric',
   month: 'long',
@@ -411,3 +516,4 @@ todayText.textContent = new Date().toLocaleDateString('zh-TW', {
 
 render();
 renderHomework();
+setTimerFromInputs();
