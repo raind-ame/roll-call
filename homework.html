@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>作業｜班級管理</title>
+  <!-- 改過 style.css 或 script.js 後，三個 HTML 檔裡的 ?v= 數字都要加 1，瀏覽器才不會繼續用舊的快取 -->
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body data-page="homework">
+  <main class="container">
+    <header class="header">
+      <h1>班級管理</h1>
+      <p id="today" class="today"></p>
+    </header>
+
+    <nav class="tabs">
+      <a href="index.html" class="tab">點名</a>
+      <a href="homework.html" class="tab active" aria-current="page">作業</a>
+      <a href="timer.html" class="tab">計時器</a>
+    </nav>
+
+    <section class="card">
+      <form id="homework-form" class="homework-form">
+        <input id="homework-title" type="text" placeholder="作業名稱，例如：數學習作 P.12" autocomplete="off" required>
+        <input id="homework-due" type="date" title="截止日期" required>
+        <button type="submit" class="btn btn-primary">新增作業</button>
+      </form>
+      <p class="hint">點作業可以展開，勾選已經交的學生。</p>
+    </section>
+
+    <ul id="homework-list" class="homework-list"></ul>
+    <p id="homework-empty" class="card empty-tip">還沒有作業，先新增一份吧。</p>
+  </main>
+
+  <script src="script.js?v=2"></script>
+</body>
+</html>

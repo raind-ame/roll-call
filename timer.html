@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>計時器｜班級管理</title>
+  <!-- 改過 style.css 或 script.js 後，三個 HTML 檔裡的 ?v= 數字都要加 1，瀏覽器才不會繼續用舊的快取 -->
+  <link rel="stylesheet" href="style.css?v=2">
+</head>
+<body data-page="timer">
+  <main class="container">
+    <header class="header">
+      <h1>班級管理</h1>
+      <p id="today" class="today"></p>
+    </header>
+
+    <nav class="tabs">
+      <a href="index.html" class="tab">點名</a>
+      <a href="homework.html" class="tab">作業</a>
+      <a href="timer.html" class="tab active" aria-current="page">計時器</a>
+    </nav>
+
+    <section class="card timer">
+      <div id="timer-display" class="timer-display">05:00</div>
+      <span class="progress-bar"><span id="timer-fill" class="progress-fill"></span></span>
+
+      <div class="timer-presets">
+        <button type="button" class="btn" data-minutes="1">1 分鐘</button>
+        <button type="button" class="btn" data-minutes="3">3 分鐘</button>
+        <button type="button" class="btn" data-minutes="5">5 分鐘</button>
+        <button type="button" class="btn" data-minutes="10">10 分鐘</button>
+      </div>
+
+      <div class="timer-inputs">
+        <input id="timer-minutes" type="number" min="0" max="999" value="5" aria-label="分鐘"> 分
+        <input id="timer-seconds" type="number" min="0" max="59" value="0" aria-label="秒"> 秒
+      </div>
+
+      <div class="timer-controls">
+        <button type="button" id="timer-start" class="btn btn-primary">開始</button>
+        <button type="button" id="timer-reset" class="btn">重設</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="script.js?v=2"></script>
+</body>
+</html>

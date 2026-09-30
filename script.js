@@ -1,48 +1,15 @@
+// 三個頁面共用這支程式，依 <body data-page="..."> 決定要啟動哪個功能
+
+// ===== 共用 =====
+
 const STORAGE_KEY = 'roll-call-students';
 const DATE_KEY = 'roll-call-date';
 const HOMEWORK_KEY = 'roll-call-homework';
 const STATUS_LABELS = { present: '出席', late: '遲到', absent: '缺席' };
 const today = new Date().toLocaleDateString('zh-TW');
-
-const todayText = document.getElementById('today');
-const addForm = document.getElementById('add-form');
-const nameInput = document.getElementById('name-input');
-const studentList = document.getElementById('student-list');
-const emptyTip = document.getElementById('empty-tip');
-const restPresentBtn = document.getElementById('rest-present-btn');
-const resetBtn = document.getElementById('reset-btn');
-const clearBtn = document.getElementById('clear-btn');
-const statTotal = document.getElementById('stat-total');
-const statPresent = document.getElementById('stat-present');
-const statLate = document.getElementById('stat-late');
-const statAbsent = document.getElementById('stat-absent');
-const statUnmarked = document.getElementById('stat-unmarked');
-const pickedName = document.getElementById('picked-name');
-const pickBtn = document.getElementById('pick-btn');
-const tabs = document.querySelectorAll('.tab');
-const tabPanels = document.querySelectorAll('.tab-panel');
-const homeworkForm = document.getElementById('homework-form');
-const homeworkTitle = document.getElementById('homework-title');
-const homeworkDue = document.getElementById('homework-due');
-const homeworkList = document.getElementById('homework-list');
-const homeworkEmpty = document.getElementById('homework-empty');
-const timerDisplay = document.getElementById('timer-display');
-const timerFill = document.getElementById('timer-fill');
-const timerPresets = document.querySelectorAll('[data-minutes]');
-const timerMinutes = document.getElementById('timer-minutes');
-const timerSeconds = document.getElementById('timer-seconds');
-const timerStartBtn = document.getElementById('timer-start');
-const timerResetBtn = document.getElementById('timer-reset');
+const page = document.body.dataset.page;
 
 let students = loadStudents();
-let pickedStudent = ''; // 最近一次抽中的姓名，用來在名單中標示
-let homework = loadHomework();
-let openHomeworkId = null; // 目前展開的作業
-let timerTotal = 0; // 設定的秒數
-let timerRemaining = 0; // 剩下的秒數
-let timerEndAt = 0; // 預計結束的時間點，用時間差計算才不會越跑越慢
-let timerId = null;
-let audioCtx = null;
 
 function loadStudents() {
   let data;
@@ -63,6 +30,25 @@ function saveStudents() {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
   localStorage.setItem(DATE_KEY, today);
 }
+
+// ===== 點名（index.html） =====
+
+const addForm = document.getElementById('add-form');
+const nameInput = document.getElementById('name-input');
+const studentList = document.getElementById('student-list');
+const emptyTip = document.getElementById('empty-tip');
+const restPresentBtn = document.getElementById('rest-present-btn');
+const resetBtn = document.getElementById('reset-btn');
+const clearBtn = document.getElementById('clear-btn');
+const statTotal = document.getElementById('stat-total');
+const statPresent = document.getElementById('stat-present');
+const statLate = document.getElementById('stat-late');
+const statAbsent = document.getElementById('stat-absent');
+const statUnmarked = document.getElementById('stat-unmarked');
+const pickedName = document.getElementById('picked-name');
+const pickBtn = document.getElementById('pick-btn');
+
+let pickedStudent = ''; // 最近一次抽中的姓名，用來在名單中標示
 
 function render() {
   studentList.innerHTML = '';
@@ -119,11 +105,10 @@ function renderStats() {
   statUnmarked.textContent = count('');
 }
 
-// 儲存後重新渲染畫面；名單變動會影響作業的繳交人數，所以作業也要重畫
+// 儲存後重新渲染畫面
 function update() {
   saveStudents();
   render();
-  renderHomework();
 }
 
 function addStudents() {
@@ -171,71 +156,73 @@ function pickRandom() {
   }, 60);
 }
 
-addForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  addStudents();
-});
-
-// Enter 直接新增、Shift + Enter 換行；中文輸入法選字時按的 Enter 不算
-nameInput.addEventListener('keydown', (e) => {
-  if (e.key !== 'Enter' || e.shiftKey || e.isComposing || e.keyCode === 229) return;
-  e.preventDefault();
-  addStudents();
-});
-
-studentList.addEventListener('click', (e) => {
-  const btn = e.target.closest('button');
-  if (!btn) return;
-
-  const index = Number(btn.dataset.index);
-  const student = students[index];
-
-  if (btn.dataset.action === 'delete') {
-    students.splice(index, 1);
-  } else if (btn.dataset.action === 'status') {
-    // 再點一次同一個狀態就取消
-    student.status = student.status === btn.dataset.status ? '' : btn.dataset.status;
-  }
-  update();
-});
-
-pickBtn.addEventListener('click', pickRandom);
-
-restPresentBtn.addEventListener('click', () => {
-  students.forEach((student) => {
-    if (!student.status) student.status = 'present';
+function initAttendance() {
+  addForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    addStudents();
   });
-  update();
-});
 
-resetBtn.addEventListener('click', () => {
-  if (students.length === 0) return;
-  if (confirm('確定要清除今天的點名紀錄嗎？')) {
-    students.forEach((student) => (student.status = ''));
+  // Enter 直接新增、Shift + Enter 換行；中文輸入法選字時按的 Enter 不算
+  nameInput.addEventListener('keydown', (e) => {
+    if (e.key !== 'Enter' || e.shiftKey || e.isComposing || e.keyCode === 229) return;
+    e.preventDefault();
+    addStudents();
+  });
+
+  studentList.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+
+    const index = Number(btn.dataset.index);
+    const student = students[index];
+
+    if (btn.dataset.action === 'delete') {
+      students.splice(index, 1);
+    } else if (btn.dataset.action === 'status') {
+      // 再點一次同一個狀態就取消
+      student.status = student.status === btn.dataset.status ? '' : btn.dataset.status;
+    }
     update();
-  }
-});
+  });
 
-clearBtn.addEventListener('click', () => {
-  if (students.length === 0) return;
-  if (confirm('確定要清空所有學生嗎？')) {
-    students = [];
-    update();
-  }
-});
+  pickBtn.addEventListener('click', pickRandom);
 
-// ===== 分頁切換 =====
-
-tabs.forEach((tab) => {
-  tab.addEventListener('click', () => {
-    tabs.forEach((item) => item.classList.toggle('active', item === tab));
-    tabPanels.forEach((panel) => {
-      panel.hidden = panel.id !== `tab-${tab.dataset.tab}`;
+  restPresentBtn.addEventListener('click', () => {
+    students.forEach((student) => {
+      if (!student.status) student.status = 'present';
     });
+    update();
   });
-});
 
-// ===== 作業管理 =====
+  resetBtn.addEventListener('click', () => {
+    if (students.length === 0) return;
+    if (confirm('確定要清除今天的點名紀錄嗎？')) {
+      students.forEach((student) => (student.status = ''));
+      update();
+    }
+  });
+
+  clearBtn.addEventListener('click', () => {
+    if (students.length === 0) return;
+    if (confirm('確定要清空所有學生嗎？')) {
+      students = [];
+      update();
+    }
+  });
+
+  render();
+}
+
+// ===== 作業管理（homework.html） =====
+
+const homeworkForm = document.getElementById('homework-form');
+const homeworkTitle = document.getElementById('homework-title');
+const homeworkDue = document.getElementById('homework-due');
+const homeworkList = document.getElementById('homework-list');
+const homeworkEmpty = document.getElementById('homework-empty');
+
+let homework = loadHomework();
+let openHomeworkId = null; // 目前展開的作業
 
 function loadHomework() {
   try {
@@ -333,7 +320,7 @@ function createHomeworkDetail(hw, missing) {
   const detail = createEl('div', 'homework-detail');
 
   if (students.length === 0) {
-    detail.appendChild(createEl('p', 'hint', '還沒有學生，請先到「點名」分頁新增名單。'));
+    detail.appendChild(createEl('p', 'hint', '還沒有學生，請先到「點名」頁新增名單。'));
   } else {
     const missingText = missing.length
       ? `未交（${missing.length}）：${missing.map((student) => student.name).join('、')}`
@@ -370,51 +357,69 @@ function createHomeworkDetail(hw, missing) {
   return detail;
 }
 
-homeworkForm.addEventListener('submit', (e) => {
-  e.preventDefault();
-  const title = homeworkTitle.value.trim();
-  if (!title) return;
+function initHomework() {
+  homeworkForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const title = homeworkTitle.value.trim();
+    if (!title) return;
 
-  const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-  homework.push({ id, title, due: homeworkDue.value, submitted: [] });
-  // 截止日期保留不清空，方便連續新增同一天要交的作業
-  homeworkTitle.value = '';
-  updateHomework();
-});
-
-homeworkList.addEventListener('click', (e) => {
-  const btn = e.target.closest('[data-action]');
-  if (!btn) return;
-
-  const hw = homework.find((item) => item.id === btn.dataset.id);
-  const action = btn.dataset.action;
-
-  if (action === 'toggle') {
-    openHomeworkId = openHomeworkId === hw.id ? null : hw.id;
-    renderHomework();
-  } else if (action === 'submit-all') {
-    hw.submitted = students.map((student) => student.name);
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    homework.push({ id, title, due: homeworkDue.value, submitted: [] });
+    // 截止日期保留不清空，方便連續新增同一天要交的作業
+    homeworkTitle.value = '';
     updateHomework();
-  } else if (action === 'delete-homework' && confirm(`確定要刪除「${hw.title}」嗎？`)) {
-    homework = homework.filter((item) => item !== hw);
+  });
+
+  homeworkList.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-action]');
+    if (!btn) return;
+
+    const hw = homework.find((item) => item.id === btn.dataset.id);
+    const action = btn.dataset.action;
+
+    if (action === 'toggle') {
+      openHomeworkId = openHomeworkId === hw.id ? null : hw.id;
+      renderHomework();
+    } else if (action === 'submit-all') {
+      hw.submitted = students.map((student) => student.name);
+      updateHomework();
+    } else if (action === 'delete-homework' && confirm(`確定要刪除「${hw.title}」嗎？`)) {
+      homework = homework.filter((item) => item !== hw);
+      updateHomework();
+    }
+  });
+
+  // 勾選／取消勾選繳交
+  homeworkList.addEventListener('change', (e) => {
+    const { id, name } = e.target.dataset;
+    const hw = homework.find((item) => item.id === id);
+
+    if (e.target.checked) {
+      hw.submitted.push(name);
+    } else {
+      hw.submitted = hw.submitted.filter((submittedName) => submittedName !== name);
+    }
     updateHomework();
-  }
-});
+  });
 
-// 勾選／取消勾選繳交
-homeworkList.addEventListener('change', (e) => {
-  const { id, name } = e.target.dataset;
-  const hw = homework.find((item) => item.id === id);
+  renderHomework();
+}
 
-  if (e.target.checked) {
-    hw.submitted.push(name);
-  } else {
-    hw.submitted = hw.submitted.filter((submittedName) => submittedName !== name);
-  }
-  updateHomework();
-});
+// ===== 計時器（timer.html） =====
 
-// ===== 計時器 =====
+const timerDisplay = document.getElementById('timer-display');
+const timerFill = document.getElementById('timer-fill');
+const timerPresets = document.querySelectorAll('[data-minutes]');
+const timerMinutes = document.getElementById('timer-minutes');
+const timerSeconds = document.getElementById('timer-seconds');
+const timerStartBtn = document.getElementById('timer-start');
+const timerResetBtn = document.getElementById('timer-reset');
+
+let timerTotal = 0; // 設定的秒數
+let timerRemaining = 0; // 剩下的秒數
+let timerEndAt = 0; // 預計結束的時間點，用時間差計算才不會越跑越慢
+let timerId = null;
+let audioCtx = null;
 
 function formatTime(seconds) {
   const minutes = String(Math.floor(seconds / 60)).padStart(2, '0');
@@ -487,33 +492,39 @@ function setTimerFromInputs() {
   renderTimer();
 }
 
-timerPresets.forEach((btn) => {
-  btn.addEventListener('click', () => {
-    timerMinutes.value = btn.dataset.minutes;
-    timerSeconds.value = 0;
-    setTimerFromInputs();
+function initTimer() {
+  timerPresets.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      timerMinutes.value = btn.dataset.minutes;
+      timerSeconds.value = 0;
+      setTimerFromInputs();
+    });
   });
-});
 
-timerMinutes.addEventListener('input', setTimerFromInputs);
-timerSeconds.addEventListener('input', setTimerFromInputs);
-timerResetBtn.addEventListener('click', setTimerFromInputs);
+  timerMinutes.addEventListener('input', setTimerFromInputs);
+  timerSeconds.addEventListener('input', setTimerFromInputs);
+  timerResetBtn.addEventListener('click', setTimerFromInputs);
 
-timerStartBtn.addEventListener('click', () => {
-  if (timerId) {
-    stopTimer();
-  } else {
-    startTimer();
-  }
-});
+  timerStartBtn.addEventListener('click', () => {
+    if (timerId) {
+      stopTimer();
+    } else {
+      startTimer();
+    }
+  });
 
-todayText.textContent = new Date().toLocaleDateString('zh-TW', {
+  setTimerFromInputs();
+}
+
+// ===== 啟動 =====
+
+document.getElementById('today').textContent = new Date().toLocaleDateString('zh-TW', {
   year: 'numeric',
   month: 'long',
   day: 'numeric',
   weekday: 'long',
 });
 
-render();
-renderHomework();
-setTimerFromInputs();
+if (page === 'attendance') initAttendance();
+if (page === 'homework') initHomework();
+if (page === 'timer') initTimer();

@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>班級管理</title>
-  <!-- 改過 style.css 或 script.js 後，要把下面兩個 ?v= 的數字加 1，瀏覽器才不會繼續用舊的快取 -->
-  <link rel="stylesheet" href="style.css?v=1">
+  <title>點名｜班級管理</title>
+  <!-- 改過 style.css 或 script.js 後，三個 HTML 檔裡的 ?v= 數字都要加 1，瀏覽器才不會繼續用舊的快取 -->
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
-<body>
+<body data-page="attendance">
   <main class="container">
     <header class="header">
       <h1>班級管理</h1>
@@ -15,87 +15,47 @@
     </header>
 
     <nav class="tabs">
-      <button type="button" class="tab active" data-tab="attendance">點名</button>
-      <button type="button" class="tab" data-tab="homework">作業</button>
-      <button type="button" class="tab" data-tab="timer">計時器</button>
+      <a href="index.html" class="tab active" aria-current="page">點名</a>
+      <a href="homework.html" class="tab">作業</a>
+      <a href="timer.html" class="tab">計時器</a>
     </nav>
 
-    <div id="tab-attendance" class="tab-panel">
-      <section class="card">
-        <form id="add-form" class="add-form">
-          <textarea id="name-input" rows="2" placeholder="輸入學生姓名，多人可用逗號或換行分隔"></textarea>
-          <button type="submit" class="btn btn-primary">新增</button>
-        </form>
-        <p class="hint">按 Enter 新增，Shift + Enter 換行；也可以直接從 Excel 貼上整欄姓名。</p>
-      </section>
+    <section class="card">
+      <form id="add-form" class="add-form">
+        <textarea id="name-input" rows="2" placeholder="輸入學生姓名，多人可用逗號或換行分隔"></textarea>
+        <button type="submit" class="btn btn-primary">新增</button>
+      </form>
+      <p class="hint">按 Enter 新增，Shift + Enter 換行；也可以直接從 Excel 貼上整欄姓名。</p>
+    </section>
 
-      <section class="stats">
-        <div class="stat"><strong id="stat-total">0</strong>總人數</div>
-        <div class="stat present"><strong id="stat-present">0</strong>出席</div>
-        <div class="stat late"><strong id="stat-late">0</strong>遲到</div>
-        <div class="stat absent"><strong id="stat-absent">0</strong>缺席</div>
-        <div class="stat"><strong id="stat-unmarked">0</strong>未點名</div>
-      </section>
+    <section class="stats">
+      <div class="stat"><strong id="stat-total">0</strong>總人數</div>
+      <div class="stat present"><strong id="stat-present">0</strong>出席</div>
+      <div class="stat late"><strong id="stat-late">0</strong>遲到</div>
+      <div class="stat absent"><strong id="stat-absent">0</strong>缺席</div>
+      <div class="stat"><strong id="stat-unmarked">0</strong>未點名</div>
+    </section>
 
-      <section class="card picker">
-        <div id="picked-name" class="picked-name">？</div>
-        <p class="hint">從沒有缺席的學生中隨機抽出一位</p>
-        <button type="button" id="pick-btn" class="btn btn-primary">隨機點名</button>
-      </section>
+    <section class="card picker">
+      <div id="picked-name" class="picked-name">？</div>
+      <p class="hint">從沒有缺席的學生中隨機抽出一位</p>
+      <button type="button" id="pick-btn" class="btn btn-primary">隨機點名</button>
+    </section>
 
-      <section class="card">
-        <div class="list-header">
-          <h2>學生名單</h2>
-          <div class="actions">
-            <button type="button" id="rest-present-btn" class="btn" title="把還沒點名的學生都設為出席">其餘設為出席</button>
-            <button type="button" id="reset-btn" class="btn">重設點名</button>
-            <button type="button" id="clear-btn" class="btn btn-danger">清空名單</button>
-          </div>
+    <section class="card">
+      <div class="list-header">
+        <h2>學生名單</h2>
+        <div class="actions">
+          <button type="button" id="rest-present-btn" class="btn" title="把還沒點名的學生都設為出席">其餘設為出席</button>
+          <button type="button" id="reset-btn" class="btn">重設點名</button>
+          <button type="button" id="clear-btn" class="btn btn-danger">清空名單</button>
         </div>
-        <ul id="student-list" class="student-list"></ul>
-        <p id="empty-tip" class="empty-tip">目前還沒有學生，請先新增名單。</p>
-      </section>
-    </div>
-
-    <div id="tab-homework" class="tab-panel" hidden>
-      <section class="card">
-        <form id="homework-form" class="homework-form">
-          <input id="homework-title" type="text" placeholder="作業名稱，例如：數學習作 P.12" autocomplete="off" required>
-          <input id="homework-due" type="date" title="截止日期" required>
-          <button type="submit" class="btn btn-primary">新增作業</button>
-        </form>
-        <p class="hint">點作業可以展開，勾選已經交的學生。</p>
-      </section>
-
-      <ul id="homework-list" class="homework-list"></ul>
-      <p id="homework-empty" class="card empty-tip">還沒有作業，先新增一份吧。</p>
-    </div>
-
-    <div id="tab-timer" class="tab-panel" hidden>
-      <section class="card timer">
-        <div id="timer-display" class="timer-display">05:00</div>
-        <span class="progress-bar"><span id="timer-fill" class="progress-fill"></span></span>
-
-        <div class="timer-presets">
-          <button type="button" class="btn" data-minutes="1">1 分鐘</button>
-          <button type="button" class="btn" data-minutes="3">3 分鐘</button>
-          <button type="button" class="btn" data-minutes="5">5 分鐘</button>
-          <button type="button" class="btn" data-minutes="10">10 分鐘</button>
-        </div>
-
-        <div class="timer-inputs">
-          <input id="timer-minutes" type="number" min="0" max="999" value="5" aria-label="分鐘"> 分
-          <input id="timer-seconds" type="number" min="0" max="59" value="0" aria-label="秒"> 秒
-        </div>
-
-        <div class="timer-controls">
-          <button type="button" id="timer-start" class="btn btn-primary">開始</button>
-          <button type="button" id="timer-reset" class="btn">重設</button>
-        </div>
-      </section>
-    </div>
+      </div>
+      <ul id="student-list" class="student-list"></ul>
+      <p id="empty-tip" class="empty-tip">目前還沒有學生，請先新增名單。</p>
+    </section>
   </main>
 
-  <script src="script.js?v=1"></script>
+  <script src="script.js?v=2"></script>
 </body>
 </html>
