@@ -54,6 +54,53 @@ body {
   margin-bottom: 16px;
 }
 
+/* 分頁 */
+.tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  margin-bottom: 16px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.tab {
+  flex: 1;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.tab:hover {
+  color: var(--text);
+}
+
+.tab.active {
+  background: var(--primary);
+  color: #fff;
+}
+
+/* 輸入框 */
+.add-form textarea,
+.homework-form input {
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+}
+
+.add-form textarea:focus,
+.homework-form input:focus {
+  outline: 2px solid var(--primary);
+  border-color: transparent;
+}
+
 /* 新增學生 */
 .add-form {
   display: flex;
@@ -62,16 +109,7 @@ body {
 
 .add-form textarea {
   flex: 1;
-  padding: 10px 12px;
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  font: inherit;
   resize: vertical;
-}
-
-.add-form textarea:focus {
-  outline: 2px solid var(--primary);
-  border-color: transparent;
 }
 
 .hint {
@@ -290,6 +328,162 @@ body {
   padding: 24px 0;
 }
 
+/* 作業管理 */
+.homework-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.homework-form input[type="text"] {
+  flex: 1 1 200px;
+  min-width: 0;
+}
+
+.homework-list {
+  list-style: none;
+}
+
+.homework {
+  padding: 0;
+  overflow: hidden;
+}
+
+.homework-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+  padding: 16px 20px;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.homework-header:hover {
+  background: #f9fafb;
+}
+
+.homework-header::after {
+  content: "▾";
+  color: var(--muted);
+  transition: transform 0.15s;
+}
+
+.homework.open .homework-header::after {
+  transform: rotate(180deg);
+}
+
+.homework-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.homework-title {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.homework-meta {
+  display: block;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.badge {
+  display: inline-block;
+  margin-left: 8px;
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #eef2ff;
+  color: var(--primary);
+  font-size: 0.75rem;
+  line-height: 1.6;
+}
+
+.badge.today {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.badge.overdue {
+  background: #fee2e2;
+  color: var(--danger);
+}
+
+.badge.complete {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.homework-progress {
+  flex-shrink: 0;
+  width: 96px;
+  text-align: right;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.progress-bar {
+  display: block;
+  height: 6px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progress-fill {
+  display: block;
+  height: 100%;
+  background: var(--present);
+}
+
+.homework-detail {
+  padding: 16px 20px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.missing-list {
+  margin-bottom: 12px;
+}
+
+.submit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.submit-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.submit-item:hover {
+  background: #f9fafb;
+}
+
+.submit-item.done {
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+  color: #15803d;
+}
+
+.submit-item input {
+  accent-color: var(--present);
+}
+
 /* 手機版 */
 @media (max-width: 520px) {
   .stats {
@@ -304,5 +498,17 @@ body {
     order: 1;
     width: 100%;
     padding-left: calc(2em + 12px);
+  }
+
+  .homework-form input[type="date"] {
+    flex: 1;
+  }
+
+  .homework-header {
+    gap: 12px;
+  }
+
+  .homework-progress {
+    width: 64px;
   }
 }
